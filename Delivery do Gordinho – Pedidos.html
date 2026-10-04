@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Delivery do Gordinho – Faça seu pedido</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#FFC93C;--surface:#FFF8E1;--ink:#2B1A12;--muted:#6B5444;--red:#D72D1F;--onred:#fff;--line:#2B1A12;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2B1A12;--surface:#3A261B;--ink:#FFF1C9;--muted:#D9BE9A;--red:#F2493A;--line:#FFC93C}}
+:root[data-theme="dark"]{--bg:#2B1A12;--surface:#3A261B;--ink:#FFF1C9;--muted:#D9BE9A;--red:#F2493A;--line:#FFC93C}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 56px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 "DM Sans",system-ui,sans-serif;padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 16px}
+h1{font:400 clamp(40px,12vw,64px)/.95 "Bowlby One",Impact,sans-serif;margin:0 0 10px;letter-spacing:.5px}
+header p{margin:0;color:var(--muted);font-weight:500}
+nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;display:flex;gap:8px;overflow-x:auto;padding:10px 16px;border-bottom:2px solid var(--line)}
+nav a{flex:none;color:var(--ink);text-decoration:none;font-weight:700;padding:6px 14px;border:2px solid var(--line);border-radius:999px}
+nav a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+nav a:active{background:var(--ink);color:var(--bg)}
+section{padding-top:24px}
+h2{font:400 26px/1.1 "Bowlby One",Impact,sans-serif;margin:0 0 6px}
+.item{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:14px 0;border-bottom:2px dashed var(--line)}
+.emoji{font-size:34px;text-align:center}
+.item h3{margin:0;font-size:17px}
+.item p{margin:2px 0 4px;color:var(--muted);font-size:14px}
+.price{font-weight:700}
+.step{display:flex;align-items:center;gap:8px}
+.step button{width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:700 20px/1 "DM Sans",sans-serif;cursor:pointer}
+.step button.add{background:var(--red);color:var(--onred);border-color:var(--red)}
+.step span{min-width:18px;text-align:center;font-weight:700}
+#bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:2px solid var(--line);z-index:10}
+#bar button,.cta{width:100%;max-width:608px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border:0;border-radius:14px;background:var(--red);color:var(--onred);font:700 17px "DM Sans",sans-serif;cursor:pointer}
+#bar button:disabled{opacity:.45;cursor:not-allowed}
+#sheet{position:fixed;inset:0;z-index:20;display:none;background:rgba(0,0,0,.55)}
+#sheet.open{display:block}
+.panel{position:absolute;left:0;right:0;bottom:0;max-height:92%;overflow:auto;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+.panel .in{max-width:608px;margin:0 auto}
+.row{display:flex;justify-content:space-between;gap:12px;padding:6px 0}
+.total{font-weight:700;font-size:18px;border-top:2px solid var(--line);margin-top:8px;padding-top:10px}
+label{display:block;font-weight:700;margin:14px 0 4px}
+input,select,textarea{width:100%;padding:12px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+.close{float:right;background:none;border:0;color:var(--ink);font-size:28px;cursor:pointer;line-height:1}
+.err{color:var(--red);font-weight:700;min-height:20px;margin:8px 0 0}
+.cta{margin-top:12px;justify-content:center}
+.empty{color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.panel{animation:up .22s ease-out}@keyframes up{from{transform:translateY(40px);opacity:.6}}}
+
+.screen{display:none;min-height:100vh;padding:40px 16px calc(40px + env(safe-area-inset-bottom,0px))}
+.screen.on{display:block}
+.box{max-width:420px;margin:0 auto}
+.box h1{font-size:clamp(38px,11vw,56px)}
+.box h2{margin:24px 0 8px}
+.box p{color:var(--muted);font-weight:500;margin:0 0 8px}
+.store{display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:center;width:100%;margin-top:16px;padding:16px;text-align:left;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:16px;font:inherit;cursor:pointer}
+.store .emoji{font-size:42px}
+.store strong{display:block;font-size:18px}
+.store span{color:var(--muted);font-size:14px}
+.store:active{background:var(--bg)}
+.link{background:none;border:0;padding:0;margin-top:12px;color:var(--ink);font:700 14px "DM Sans",sans-serif;text-decoration:underline;cursor:pointer}
+</style>
+</head>
+<body>
+<section class="screen on" id="login"><div class="box">
+ <h1>Delivery do Gordinho</h1>
+ <p>Entre para pedir seu lanche.</p>
+ <label for="email">E-mail</label><input id="email" type="email" autocomplete="email" placeholder="voce@email.com">
+ <label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password" placeholder="Sua senha">
+ <button class="cta" id="entrar">Entrar</button>
+</div></section>
+
+<section class="screen" id="stores"><div class="box">
+ <h2>Escolha uma loja</h2>
+ <p>Lojas que entregam na sua região.</p>
+ <button class="store" id="loja"><span class="emoji" aria-hidden="true">🍔</span><div><strong>Delivery do Gordinho</strong><span>Lanches · Entrega grátis · 60 a 90 min · Pedido mínimo R$ 20,00</span></div></button>
+ <button class="link" id="sair">Sair</button>
+</div></section>
+
+<div id="app" style="display:none">
+<div class="wrap">
+<header>
+ <button class="link" id="trocar">Trocar loja</button>
+ <h1>Delivery do Gordinho</h1>
+ <p>Entrega grátis · 60 a 90 min · pedido mínimo R$ 20,00. Não entregamos somente bebidas.</p>
+</header>
+</div>
+<nav id="tabs"></nav>
+<main class="wrap" id="menu"></main>
+
+<div id="bar"><button id="open" disabled><span id="count">Carrinho vazio</span><span id="sum"></span></button></div>
+
+<div id="sheet" role="dialog" aria-modal="true" aria-label="Seu pedido">
+ <div class="panel"><div class="in">
+  <button class="close" id="close" aria-label="Fechar">×</button>
+  <h2>Seu pedido</h2>
+  <div id="lines"></div>
+  <div class="row total"><span>Total</span><span id="tot"></span></div>
+  <label for="nome">Seu nome</label><input id="nome" autocomplete="name">
+  <label for="end">Endereço de entrega</label><input id="end" autocomplete="street-address" placeholder="Rua, número, bairro">
+  <label for="pag">Pagamento na entrega</label>
+  <select id="pag"><option>Pix</option><option>Dinheiro</option><option>Cartão</option></select>
+  <label for="obs">Observações</label><textarea id="obs" rows="2" placeholder="Ex.: sem cebola"></textarea>
+  <p class="err" id="err" role="alert"></p>
+  <button class="cta" id="send">Enviar pedido pelo WhatsApp</button>
+ </div></div>
+</div>
+
+</div>
+
+<script>
+// Troque pelo número da lanchonete (DDI + DDD + número, só dígitos)
+var WHATS = "5511999999999";
+var BASE = "banana, alface, tomate, salada de maionese, milho e palha";
+var seq = 0;
+function it(e,n,d,p){return {id:"i"+(seq++),e:e,n:n,d:d,p:p}}
+function fam(e,prot,suf,egg,prices){
+ var t=[["Hambúrguer",""],["X Burguer","queijo"],["X Presunto","queijo, presunto"],["X Bacon","queijo, bacon"],["X Egg","queijo, ovo"],["X Egg Presunto","queijo, ovo, presunto"],["X Egg Bacon","queijo, ovo, bacon"],["X Total",(egg?"ovo, ":"")+"queijo, presunto, bacon"],["X Total Duplo","2 ovos, 2 queijos, 2 presuntos, bacon"]];
+ return t.map(function(r,i){
+  var d = prot + (r[1]?", "+r[1]:"") + ", " + BASE;
+  return it(e, r[0]+(suf&&i>0?" "+suf:(suf&&i===0?" "+suf:"")), d.charAt(0).toUpperCase()+d.slice(1), prices[i]);
+ });
+}
+var tr = fam("🍔","bife","",false,[12,14,16,18,17,19,19,20,30]);
+var ca = fam("🥩","bife caseiro","Caseiro",true,[15.5,16.5,19,20,21,23,25,30,40]);
+var cl = fam("🌭","calabresa","Calabresa",true,[15,17,18,19,16,18,19,27,30]);
+var pi = fam("🥩","bife de picanha","Bife de Picanha",true,[15,16,18,20,20,19,25,27,38]);
+pi[0].n = "Hambúrguer de Picanha";
+var MENU = [
+ {cat:"Promoção", items:[
+  it("🏷️","X Bacon Catupiry","Bife, queijo, bacon, catupiry, "+BASE,22),
+  it("🏷️","X Bacon + Cheddar + Cebola","Bife, ovo, queijo, presunto, bacon, "+BASE,25),
+  it("🏷️","2 X Total","Dois X Total, com muito queijo e bacon",40),
+  it("🏷️","3 X Total","Três X Total, com muito queijo e bacon",60),
+  it("🏷️","4 X Total","Quatro X Total, com muito queijo e bacon",80),
+  it("🏷️","5 X Total","Cinco X Total, com muito queijo e bacon. De R$ 100,00 por R$ 96,00",96)]},
+ {cat:"Combos", items:[
+  it("🍔","3 Hambúrgueres","3 lanches com bife, "+BASE+". De R$ 36,00 por R$ 33,00",33),
+  it("🍔","3 X Bacon","3 lanches com bife, queijo, bacon, "+BASE+". De R$ 54,00 por R$ 50,00",50)]},
+ {cat:"Lanches especiais", items:[
+  it("🔥","Mata Fome","2 bifes, 2 ovos, bacon, cebola, "+BASE,30),
+  it("🔥","Misto Especial com pão de hambúrguer","Bife, ovo, bacon, 2 presuntos e 2 queijos",20),
+  it("🔥","X Total Triplo","3 bifes, 3 ovos, 2 queijos, 2 presuntos, bacon, "+BASE,40)]},
+ {cat:"Lanches tradicionais", items:tr},
+ {cat:"Lanches com bife caseiro", items:ca},
+ {cat:"Lanches com calabresa", items:cl},
+ {cat:"Lanches com bife de picanha", items:pi},
+ {cat:"Sachês", items:[
+  it("🥫","Maionese caseira","Sachê",2.5),
+  it("🥫","Mostarda","Sachê",1)]}
+];
+var MIN = 20;
+var cart = {}, all = {};
+var brl = function(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})};
+var $ = function(id){return document.getElementById(id)};
+
+var html = "", tabs = "";
+MENU.forEach(function(g,i){
+ tabs += '<a href="#c'+i+'">'+g.cat+'</a>';
+ html += '<section id="c'+i+'"><h2>'+g.cat+'</h2>';
+ g.items.forEach(function(it){
+  all[it.id]=it;
+  html += '<div class="item"><div class="emoji" aria-hidden="true">'+it.e+'</div><div><h3>'+it.n+'</h3><p>'+it.d+'</p><span class="price">'+brl(it.p)+'</span></div><div class="step" id="s-'+it.id+'"></div></div>';
+ });
+ html += '</section>';
+});
+$("tabs").innerHTML = tabs; $("menu").innerHTML = html;
+
+function stepper(id){
+ var q = cart[id]||0, el = $("s-"+id);
+ el.innerHTML = q ? '<button aria-label="Remover um" data-d="-1" data-id="'+id+'">−</button><span>'+q+'</span><button class="add" aria-label="Adicionar um" data-d="1" data-id="'+id+'">+</button>'
+  : '<button class="add" aria-label="Adicionar" data-d="1" data-id="'+id+'">+</button>';
+}
+function total(){var t=0,n=0;for(var k in cart){t+=cart[k]*all[k].p;n+=cart[k]}return {t:t,n:n}}
+function render(){
+ var s = total();
+ $("open").disabled = !s.n;
+ $("count").textContent = s.n ? "Ver pedido ("+s.n+(s.n>1?" itens":" item")+")" : "Carrinho vazio";
+ $("sum").textContent = s.n ? brl(s.t) : "";
+ var l = "";
+ for(var k in cart){l += '<div class="row"><span>'+cart[k]+'× '+all[k].n+'</span><span>'+brl(cart[k]*all[k].p)+'</span></div>'}
+ $("lines").innerHTML = l || '<p class="empty">Nenhum item no pedido. Feche e adicione lanches do cardápio.</p>';
+ $("tot").textContent = brl(s.t);
+}
+document.addEventListener("click", function(e){
+ var b = e.target.closest("button[data-id]"); if(!b) return;
+ var id = b.dataset.id, q = (cart[id]||0) + Number(b.dataset.d);
+ if(q<=0) delete cart[id]; else cart[id]=q;
+ stepper(id); render();
+ if(!Object.keys(cart).length) $("sheet").classList.remove("open");
+});
+for(var id in all) stepper(id);
+render();
+
+$("open").onclick = function(){$("sheet").classList.add("open");$("close").focus()};
+$("close").onclick = function(){$("sheet").classList.remove("open")};
+$("sheet").addEventListener("click", function(e){if(e.target===this) this.classList.remove("open")});
+document.addEventListener("keydown", function(e){if(e.key==="Escape") $("sheet").classList.remove("open")});
+
+$("send").onclick = function(){
+ var nome=$("nome").value.trim(), end=$("end").value.trim();
+ if(!nome || !end){$("err").textContent="Preencha seu nome e o endereço de entrega.";return}
+ var s = total();
+ if(s.t < MIN){$("err").textContent="O pedido mínimo é "+brl(MIN)+". Adicione mais itens.";return}
+ $("err").textContent="";
+ var m = "*Novo pedido – Delivery do Gordinho*\n\n";
+ for(var k in cart){m += cart[k]+"× "+all[k].n+" – "+brl(cart[k]*all[k].p)+"\n"}
+ m += "\n*Total:* "+brl(s.t)+"\n*Nome:* "+nome+"\n*Endereço:* "+end+"\n*Pagamento:* "+$("pag").value;
+ if($("obs").value.trim()) m += "\n*Obs.:* "+$("obs").value.trim();
+ window.open("https://wa.me/"+WHATS+"?text="+encodeURIComponent(m), "_blank");
+};
+function show(id){
+ ["login","stores"].forEach(function(x){$(x).classList.toggle("on",x===id)});
+ $("app").style.display = id==="app" ? "block" : "none";
+ window.scrollTo(0,0);
+}
+$("entrar").onclick = function(){show("stores")};
+$("loja").onclick = function(){show("app")};
+$("trocar").onclick = function(){show("stores")};
+$("sair").onclick = function(){show("login")};
+</script>
+</body>
+</html>
